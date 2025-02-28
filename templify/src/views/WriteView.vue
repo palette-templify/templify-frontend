@@ -1,0 +1,1 @@
+<template>writeView</template>
