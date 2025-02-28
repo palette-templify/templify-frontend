@@ -37,39 +37,53 @@
 </template>
 
 <script>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 import apiService from "@/services/apiService";
+import { useAuthStore } from "@/stores/auth";
 
 export default {
   name: "LoginView",
-  data() {
-    return {
-      email: "",
-      password: "",
-      valid: false,
-      emailRules: [
-        (v) => !!v || "Email is required",
-        (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
-      ],
-      passwordRules: [(v) => !!v || "Password is required"],
-    };
-  },
-  methods: {
-    async login() {
-      if (this.$refs.form.validate()) {
-        console.log("Logging in with", this.email);
+  setup() {
+    const email = ref("");
+    const password = ref("");
+    const valid = ref(false);
+    const form = ref(null);
+    const router = useRouter();
+    const authStore = useAuthStore();
+
+    const emailRules = [
+      (v) => !!v || "Email is required",
+      (v) => /.+@.+\..+/.test(v) || "E-mail must be valid",
+    ];
+    const passwordRules = [(v) => !!v || "Password is required"];
+
+    const login = async () => {
+      if (form.value.validate()) {
+        console.log("Logging in with", email.value);
         const payload = {
-          email: this.email,
-          password: this.password,
+          email: email.value,
+          password: password.value,
         };
         try {
           const response = await apiService.post("/api/auth/login", payload);
-          sessionStorage.setItem("accessToken", response.data.data.accessToken);
-          localStorage.setItem("refreshToken", response.data.data.refreshToken);
+          authStore.login(response.data);
+          router.push("/write");
         } catch (error) {
           console.error("Login error: ", error);
         }
       }
-    },
+    };
+
+    return {
+      email,
+      password,
+      valid,
+      form,
+      emailRules,
+      passwordRules,
+      login,
+    };
   },
 };
 </script>
