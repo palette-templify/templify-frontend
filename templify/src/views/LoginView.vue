@@ -37,6 +37,8 @@
 </template>
 
 <script>
+import apiService from "@/services/apiService";
+
 export default {
   name: "LoginView",
   data() {
@@ -52,10 +54,20 @@ export default {
     };
   },
   methods: {
-    login() {
+    async login() {
       if (this.$refs.form.validate()) {
-        // Insert login logic here
         console.log("Logging in with", this.email);
+        const payload = {
+          email: this.email,
+          password: this.password,
+        };
+        try {
+          const response = await apiService.post("/api/auth/login", payload);
+          sessionStorage.setItem("accessToken", response.data.data.accessToken);
+          localStorage.setItem("refreshToken", response.data.data.refreshToken);
+        } catch (error) {
+          console.error("Login error: ", error);
+        }
       }
     },
   },
