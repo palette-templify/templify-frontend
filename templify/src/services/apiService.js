@@ -14,11 +14,10 @@ const apiInstance = axios.create({
 
 apiInstance.interceptors.request.use(
   (config) => {
-    // Uncomment and adjust the next lines if you use an authorization token
-    // const token = localStorage.getItem("token"); <- inmemory로 accessToken 저장 필요, localStorage 미사용 예정
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
+    const token = sessionStorage.getItem("accessToken");
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => Promise.reject(error)
