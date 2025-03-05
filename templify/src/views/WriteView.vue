@@ -20,11 +20,14 @@
             </v-col>
             <v-col cols="12" md="6" class="pb-2">
               <v-select
-                v-model="selectedTemplate"
+                v-model="selectedTemplateId"
                 :items="templates"
+                item-title="name"
+                item-value="id"
                 label="Select Template"
                 variant="outlined"
                 :rules="[(v) => !!v || '템플릿을 선택해 주세요.']"
+                :loading="templatesLoading"
                 required
               ></v-select>
             </v-col>
@@ -107,7 +110,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import apiService from "@/services/apiService";
 
 export default {
@@ -116,6 +119,7 @@ export default {
     const form = ref(null);
     const valid = ref(false);
     const isLoading = ref(false);
+    const templatesLoading = ref(false);
 
     // Form inputs
     const selectedModel = ref("");
@@ -124,6 +128,10 @@ export default {
     const originalText = ref("");
     const transformedText = ref("");
 
+    // Templates from API
+    const templates = ref([]);
+
+    // AI Models
     const aiModels = [
       { title: "GPT-4", value: "gpt4" },
       // { title: "Claude 3", value: "claude3" },
@@ -131,13 +139,26 @@ export default {
       // { title: "Mistral Large", value: "mistral" },
     ];
 
-    const templates = [
-      { title: "Blog Post", value: "1" },
-      { title: "Social Media", value: "2" },
-      { title: "Email Newsletter", value: "3" },
-      { title: "Product Description", value: "4" },
-      { title: "Academic Paper", value: "5" },
-    ];
+    // Fetch templates from API
+    const fetchTemplates = async () => {
+      templatesLoading.value = true;
+      try {
+        const response = await apiService.get("/api/write/template/list");
+        if (
+          response.data &&
+          response.data.status === 200 &&
+          response.data.data
+        ) {
+          templates.value = response.data.data;
+        } else {
+          console.error("Invalid template data format:", response.data);
+        }
+      } catch (error) {
+        console.error("Error fetching templates:", error);
+      } finally {
+        templatesLoading.value = false;
+      }
+    };
 
     // Methods
     const transformText = async () => {
@@ -154,7 +175,7 @@ export default {
       };
 
       try {
-        console.log("payload;s templateId:::" + payload.templateId);
+        console.log("payload's templateId:", payload.templateId);
         const response = await apiService.post("/api/write/article", payload);
         transformedText.value = response.data.data.transformedContent;
       } catch (error) {
@@ -170,12 +191,18 @@ export default {
       // router.push("/history");
     };
 
+    // Fetch templates when component is mounted
+    onMounted(() => {
+      fetchTemplates();
+    });
+
     return {
       valid,
       form,
       isLoading,
+      templatesLoading,
       selectedModel,
-      selectedTemplate: selectedTemplateId,
+      selectedTemplateId,
       subject,
       originalText,
       transformedText,
