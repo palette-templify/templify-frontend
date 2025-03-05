@@ -78,10 +78,13 @@
           variant="outlined"
           color="grey-lighten-4"
         >
-          <v-card-text v-if="transformedText" class="text-body-1 h-100">
+          <v-card-text
+            v-if="transformedText"
+            class="result-text text-body-1 h-100"
+          >
             {{ transformedText }}
           </v-card-text>
-          <v-card-text v-else class="text-body-2 text-grey h-100">
+          <v-card-text v-else class="placeholder-text text-body-1 h-100">
             변환이 완료되면 여기에 변환 완료 결과물이 나타납니다.
           </v-card-text>
         </v-card>
@@ -116,25 +119,24 @@ export default {
 
     // Form inputs
     const selectedModel = ref("");
-    const selectedTemplate = ref("");
+    const selectedTemplateId = ref("");
     const subject = ref("");
     const originalText = ref("");
     const transformedText = ref("");
 
-    // Mock data for dropdowns (replace with actual API data in a production app)
     const aiModels = [
       { title: "GPT-4", value: "gpt4" },
-      { title: "Claude 3", value: "claude3" },
-      { title: "Llama 3", value: "llama3" },
-      { title: "Mistral Large", value: "mistral" },
+      // { title: "Claude 3", value: "claude3" },
+      // { title: "Llama 3", value: "llama3" },
+      // { title: "Mistral Large", value: "mistral" },
     ];
 
     const templates = [
-      { title: "Blog Post", value: "blog" },
-      { title: "Social Media", value: "social" },
-      { title: "Email Newsletter", value: "email" },
-      { title: "Product Description", value: "product" },
-      { title: "Academic Paper", value: "academic" },
+      { title: "Blog Post", value: "1" },
+      { title: "Social Media", value: "2" },
+      { title: "Email Newsletter", value: "3" },
+      { title: "Product Description", value: "4" },
+      { title: "Academic Paper", value: "5" },
     ];
 
     // Methods
@@ -145,19 +147,18 @@ export default {
       isLoading.value = true;
 
       const payload = {
-        model: selectedModel.value,
-        template: selectedTemplate.value,
-        subject: subject.value,
-        originalText: originalText.value,
+        // model: selectedModel.value,
+        templateId: selectedTemplateId.value,
+        title: subject.value,
+        content: originalText.value,
       };
 
       try {
-        // Replace with your actual API endpoint
-        const response = await apiService.post("/api/transform", payload);
-        transformedText.value = response.data.transformedText;
+        console.log("payload;s templateId:::" + payload.templateId);
+        const response = await apiService.post("/api/write/article", payload);
+        transformedText.value = response.data.data.transformedContent;
       } catch (error) {
         console.error("Transformation error:", error);
-        // Handle error appropriately, maybe show a snackbar
       } finally {
         isLoading.value = false;
       }
@@ -174,7 +175,7 @@ export default {
       form,
       isLoading,
       selectedModel,
-      selectedTemplate,
+      selectedTemplate: selectedTemplateId,
       subject,
       originalText,
       transformedText,
@@ -214,5 +215,18 @@ export default {
   display: flex;
   flex-direction: column;
   min-height: 300px;
+}
+
+/* Improved text styles for result area */
+.result-text {
+  color: rgba(0, 0, 0, 0.87) !important;
+  font-weight: 500 !important;
+  line-height: 1.6 !important;
+  white-space: pre-wrap;
+}
+
+.placeholder-text {
+  color: rgba(0, 0, 0, 0.7) !important;
+  font-weight: 500 !important;
 }
 </style>
