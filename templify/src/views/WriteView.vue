@@ -111,6 +111,7 @@
 
 <script>
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import apiService from "@/services/apiService";
 
 export default {
@@ -120,6 +121,7 @@ export default {
     const valid = ref(false);
     const isLoading = ref(false);
     const templatesLoading = ref(false);
+    const router = useRouter();
 
     // Form inputs
     const selectedModel = ref("");
@@ -186,9 +188,7 @@ export default {
     };
 
     const goToHistory = () => {
-      // Will be implemented later as mentioned in requirements
-      console.log("Navigate to history page");
-      // router.push("/history");
+      router.push("/history");
     };
 
     // Fetch templates when component is mounted

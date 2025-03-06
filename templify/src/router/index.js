@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import LoginView from "@/views/LoginView.vue";
 import WriteView from "@/views/WriteView.vue";
 import { useAuthStore } from "@/stores/auth";
+import HistoryView from "@/views/HistoryView.vue";
 
 const routes = [
   {
@@ -13,6 +14,12 @@ const routes = [
     path: "/write",
     name: "Write",
     component: WriteView,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: "/history",
+    name: "History",
+    component: HistoryView,
     meta: { requiresAuth: true },
   },
 ];
