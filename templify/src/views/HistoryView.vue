@@ -35,21 +35,23 @@
         class="history-table"
         :sort-by="[{ key: 'createdDate', order: 'desc' }]"
       >
-        <!-- Make NO column clickable -->
         <template #[`item.index`]="{ item }">
-          <span class="clickable-cell" @click="goToHistoryDetails(item.id)">
-            {{ item.index }}
-          </span>
+          <a @click="viewDetail(item.id)" class="clickable-cell">{{
+            item.index
+          }}</a>
         </template>
 
-        <!-- Make Content column clickable with truncation -->
         <template #[`item.content`]="{ item }">
-          <span
+          <a
+            @click="viewDetail(item.id)"
             class="clickable-cell text-truncate d-block"
-            @click="goToHistoryDetails(item.id)"
           >
             {{ item.content }}
-          </span>
+          </a>
+        </template>
+
+        <template #[`item.createdAt`]="{ item }">
+          <span class="nowrap">{{ item.createdAt }}</span>
         </template>
       </v-data-table>
     </v-card>
@@ -155,9 +157,9 @@ export default {
       router.push("/write");
     };
 
-    // Navigation to history details page
-    const goToHistoryDetails = (historyId) => {
-      router.push(`/history/${historyId}`);
+    // Navigate to detail view
+    const viewDetail = (id) => {
+      router.push(`/history/${id}`);
     };
 
     // Fetch data when component mounts
@@ -172,7 +174,7 @@ export default {
       loading,
       error,
       goToWrite,
-      goToHistoryDetails,
+      viewDetail,
     };
   },
 };
@@ -197,11 +199,16 @@ export default {
 .clickable-cell {
   cursor: pointer;
   color: inherit;
+  text-decoration: none;
 }
 
 .clickable-cell:hover {
   color: var(--v-primary-base);
   text-decoration: underline;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 /* Provide additional styling for mobile */
