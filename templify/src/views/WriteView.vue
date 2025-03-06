@@ -16,6 +16,7 @@
                 variant="outlined"
                 :rules="[(v) => !!v || 'AI 모델을 선택해 주세요.']"
                 required
+                :disabled="isLoading"
               ></v-select>
             </v-col>
             <v-col cols="12" md="6" class="pb-2">
@@ -29,6 +30,7 @@
                 :rules="[(v) => !!v || '템플릿을 선택해 주세요.']"
                 :loading="templatesLoading"
                 required
+                :disabled="isLoading"
               ></v-select>
             </v-col>
           </v-row>
@@ -41,6 +43,7 @@
             class="mb-4"
             :rules="[(v) => !!v || '제목을 입력해 주세요.']"
             required
+            :disabled="isLoading"
           ></v-text-field>
 
           <!-- Original text input to fill available space -->
@@ -52,6 +55,7 @@
             class="flex-fill mb-6"
             style="min-height: 300px"
             required
+            :disabled="isLoading"
           ></v-textarea>
 
           <!-- Transform button with centered alignment -->
@@ -65,7 +69,7 @@
               min-width="180"
               class="px-6 text-uppercase"
             >
-              Transform
+              {{ isLoading ? "Transforming..." : "Transform" }}
             </v-btn>
           </div>
         </v-form>
@@ -77,10 +81,20 @@
 
         <!-- Result card that fills available space -->
         <v-card
-          class="flex-fill mb-6"
+          class="flex-fill mb-6 position-relative"
           variant="outlined"
           color="grey-lighten-4"
         >
+          <!-- Loading overlay -->
+          <div v-if="isLoading" class="loading-overlay">
+            <v-progress-circular
+              indeterminate
+              color="primary"
+              size="64"
+            ></v-progress-circular>
+            <div class="mt-4 text-primary">변환 중입니다...</div>
+          </div>
+
           <v-card-text
             v-if="transformedText"
             class="result-text text-body-1 h-100"
@@ -100,6 +114,7 @@
             @click="goToHistory"
             min-width="180"
             class="px-6 text-uppercase"
+            :disabled="isLoading"
           >
             Go to History
           </v-btn>
@@ -255,5 +270,24 @@ export default {
 .placeholder-text {
   color: rgba(0, 0, 0, 0.7) !important;
   font-weight: 500 !important;
+}
+
+/* Loading overlay styles */
+.position-relative {
+  position: relative;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
 }
 </style>
