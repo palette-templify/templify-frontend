@@ -79,35 +79,37 @@
       <v-col cols="12" md="6" class="pa-4 d-flex flex-column">
         <h1 class="text-h4 mb-4">변환 결과</h1>
 
-        <!-- Result card that fills available space -->
-        <v-card
-          class="flex-fill mb-6 position-relative"
-          variant="outlined"
-          color="grey-lighten-4"
-        >
-          <!-- Loading overlay -->
-          <div v-if="isLoading" class="loading-overlay">
-            <v-progress-circular
-              indeterminate
-              color="primary"
-              size="64"
-            ></v-progress-circular>
-            <div class="mt-4 text-primary">변환 중입니다...</div>
-          </div>
-
-          <v-card-text
-            v-if="transformedText"
-            class="result-text text-body-1 h-100"
+        <!-- Result card that maintains fixed height relative to screen -->
+        <div class="result-wrapper">
+          <v-card
+            class="result-card position-relative"
+            variant="outlined"
+            color="grey-lighten-4"
           >
-            {{ transformedText }}
-          </v-card-text>
-          <v-card-text v-else class="placeholder-text text-body-1 h-100">
-            변환이 완료되면 여기에 변환 완료 결과물이 나타납니다.
-          </v-card-text>
-        </v-card>
+            <!-- Loading overlay -->
+            <div v-if="isLoading" class="loading-overlay">
+              <v-progress-circular
+                indeterminate
+                color="primary"
+                size="64"
+              ></v-progress-circular>
+              <div class="mt-4 text-primary">변환 중입니다...</div>
+            </div>
 
-        <!-- Go to history button with centered alignment to match Transform button -->
-        <div class="d-flex justify-center mb-2">
+            <v-card-text
+              v-if="transformedText"
+              class="result-text text-body-1 pa-4"
+            >
+              {{ transformedText }}
+            </v-card-text>
+            <v-card-text v-else class="placeholder-text text-body-1 pa-4">
+              변환이 완료되면 여기에 변환 완료 결과물이 나타납니다.
+            </v-card-text>
+          </v-card>
+        </div>
+
+        <!-- Go to history button with centered alignment -->
+        <div class="d-flex justify-center mt-6">
           <v-btn
             color="secondary"
             size="large"
@@ -252,11 +254,27 @@ export default {
   height: 100% !important;
 }
 
-/* Make result card content fill available space */
-.v-card.flex-fill :deep(.v-card-text) {
+/* Result wrapper and card with fixed height */
+.result-wrapper {
+  flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 300px;
+  max-height: calc(100vh - 230px);
+}
+
+.result-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.result-card .v-card-text {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 100%;
+  white-space: pre-wrap;
 }
 
 /* Improved text styles for result area */
@@ -264,7 +282,6 @@ export default {
   color: rgba(0, 0, 0, 0.87) !important;
   font-weight: 500 !important;
   line-height: 1.6 !important;
-  white-space: pre-wrap;
 }
 
 .placeholder-text {
