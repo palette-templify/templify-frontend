@@ -35,8 +35,21 @@
         class="history-table"
         :sort-by="[{ key: 'createdDate', order: 'desc' }]"
       >
+        <!-- Make NO column clickable -->
+        <template #[`item.index`]="{ item }">
+          <span class="clickable-cell" @click="goToHistoryDetails(item.id)">
+            {{ item.index }}
+          </span>
+        </template>
+
+        <!-- Make Content column clickable with truncation -->
         <template #[`item.content`]="{ item }">
-          <span class="text-truncate d-block">{{ item.content }}</span>
+          <span
+            class="clickable-cell text-truncate d-block"
+            @click="goToHistoryDetails(item.id)"
+          >
+            {{ item.content }}
+          </span>
         </template>
       </v-data-table>
     </v-card>
@@ -142,6 +155,11 @@ export default {
       router.push("/write");
     };
 
+    // Navigation to history details page
+    const goToHistoryDetails = (historyId) => {
+      router.push(`/history/${historyId}`);
+    };
+
     // Fetch data when component mounts
     onMounted(() => {
       fetchHistories();
@@ -154,6 +172,7 @@ export default {
       loading,
       error,
       goToWrite,
+      goToHistoryDetails,
     };
   },
 };
@@ -173,6 +192,16 @@ export default {
 .history-table :deep(td) {
   max-width: 0;
   overflow: hidden;
+}
+
+.clickable-cell {
+  cursor: pointer;
+  color: inherit;
+}
+
+.clickable-cell:hover {
+  color: var(--v-primary-base);
+  text-decoration: underline;
 }
 
 /* Provide additional styling for mobile */
