@@ -3,6 +3,7 @@ import LoginView from "@/views/LoginView.vue";
 import WriteView from "@/views/WriteView.vue";
 import { useAuthStore } from "@/stores/auth";
 import HistoryView from "@/views/HistoryView.vue";
+import HistoryDetailsView from "@/views/HistoryDetailsView.vue";
 
 const routes = [
   {
@@ -21,6 +22,13 @@ const routes = [
     name: "History",
     component: HistoryView,
     meta: { requiresAuth: true },
+  },
+  {
+    path: "/history/:id",
+    name: "HistoryDetails",
+    component: HistoryDetailsView,
+    meta: { requiresAuth: true },
+    props: true,
   },
 ];
 

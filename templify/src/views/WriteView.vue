@@ -16,6 +16,7 @@
                 variant="outlined"
                 :rules="[(v) => !!v || 'AI 모델을 선택해 주세요.']"
                 required
+                :disabled="isLoading"
               ></v-select>
             </v-col>
             <v-col cols="12" md="6" class="pb-2">
@@ -29,6 +30,7 @@
                 :rules="[(v) => !!v || '템플릿을 선택해 주세요.']"
                 :loading="templatesLoading"
                 required
+                :disabled="isLoading"
               ></v-select>
             </v-col>
           </v-row>
@@ -41,6 +43,7 @@
             class="mb-4"
             :rules="[(v) => !!v || '제목을 입력해 주세요.']"
             required
+            :disabled="isLoading"
           ></v-text-field>
 
           <!-- Original text input to fill available space -->
@@ -52,6 +55,7 @@
             class="flex-fill mb-6"
             style="min-height: 300px"
             required
+            :disabled="isLoading"
           ></v-textarea>
 
           <!-- Transform button with centered alignment -->
@@ -65,7 +69,7 @@
               min-width="180"
               class="px-6 text-uppercase"
             >
-              Transform
+              {{ isLoading ? "Transforming..." : "Transform" }}
             </v-btn>
           </div>
         </v-form>
@@ -75,31 +79,44 @@
       <v-col cols="12" md="6" class="pa-4 d-flex flex-column">
         <h1 class="text-h4 mb-4">변환 결과</h1>
 
-        <!-- Result card that fills available space -->
-        <v-card
-          class="flex-fill mb-6"
-          variant="outlined"
-          color="grey-lighten-4"
-        >
-          <v-card-text
-            v-if="transformedText"
-            class="result-text text-body-1 h-100"
+        <!-- Result card that maintains fixed height relative to screen -->
+        <div class="result-wrapper">
+          <v-card
+            class="result-card position-relative"
+            variant="outlined"
+            color="grey-lighten-4"
           >
-            {{ transformedText }}
-          </v-card-text>
-          <v-card-text v-else class="placeholder-text text-body-1 h-100">
-            변환이 완료되면 여기에 변환 완료 결과물이 나타납니다.
-          </v-card-text>
-        </v-card>
+            <!-- Loading overlay -->
+            <div v-if="isLoading" class="loading-overlay">
+              <v-progress-circular
+                indeterminate
+                color="primary"
+                size="64"
+              ></v-progress-circular>
+              <div class="mt-4 text-primary">변환 중입니다...</div>
+            </div>
 
-        <!-- Go to history button with centered alignment to match Transform button -->
-        <div class="d-flex justify-center mb-2">
+            <v-card-text
+              v-if="transformedText"
+              class="result-text text-body-1 pa-4"
+            >
+              {{ transformedText }}
+            </v-card-text>
+            <v-card-text v-else class="placeholder-text text-body-1 pa-4">
+              변환이 완료되면 여기에 변환 완료 결과물이 나타납니다.
+            </v-card-text>
+          </v-card>
+        </div>
+
+        <!-- Go to history button with centered alignment -->
+        <div class="d-flex justify-center mt-6">
           <v-btn
             color="secondary"
             size="large"
             @click="goToHistory"
             min-width="180"
             class="px-6 text-uppercase"
+            :disabled="isLoading"
           >
             Go to History
           </v-btn>
@@ -237,11 +254,27 @@ export default {
   height: 100% !important;
 }
 
-/* Make result card content fill available space */
-.v-card.flex-fill :deep(.v-card-text) {
+/* Result wrapper and card with fixed height */
+.result-wrapper {
+  flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 300px;
+  max-height: calc(100vh - 230px);
+}
+
+.result-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.result-card .v-card-text {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 100%;
+  white-space: pre-wrap;
 }
 
 /* Improved text styles for result area */
@@ -249,11 +282,29 @@ export default {
   color: rgba(0, 0, 0, 0.87) !important;
   font-weight: 500 !important;
   line-height: 1.6 !important;
-  white-space: pre-wrap;
 }
 
 .placeholder-text {
   color: rgba(0, 0, 0, 0.7) !important;
   font-weight: 500 !important;
+}
+
+/* Loading overlay styles */
+.position-relative {
+  position: relative;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
 }
 </style>

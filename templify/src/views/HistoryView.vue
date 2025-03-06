@@ -35,8 +35,23 @@
         class="history-table"
         :sort-by="[{ key: 'createdDate', order: 'desc' }]"
       >
+        <template #[`item.index`]="{ item }">
+          <a @click="viewDetail(item.id)" class="clickable-cell">{{
+            item.index
+          }}</a>
+        </template>
+
         <template #[`item.content`]="{ item }">
-          <span class="text-truncate d-block">{{ item.content }}</span>
+          <a
+            @click="viewDetail(item.id)"
+            class="clickable-cell text-truncate d-block"
+          >
+            {{ item.content }}
+          </a>
+        </template>
+
+        <template #[`item.createdAt`]="{ item }">
+          <span class="nowrap">{{ item.createdAt }}</span>
         </template>
       </v-data-table>
     </v-card>
@@ -142,6 +157,11 @@ export default {
       router.push("/write");
     };
 
+    // Navigate to detail view
+    const viewDetail = (id) => {
+      router.push(`/history/${id}`);
+    };
+
     // Fetch data when component mounts
     onMounted(() => {
       fetchHistories();
@@ -154,6 +174,7 @@ export default {
       loading,
       error,
       goToWrite,
+      viewDetail,
     };
   },
 };
@@ -173,6 +194,21 @@ export default {
 .history-table :deep(td) {
   max-width: 0;
   overflow: hidden;
+}
+
+.clickable-cell {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+.clickable-cell:hover {
+  color: var(--v-primary-base);
+  text-decoration: underline;
+}
+
+.nowrap {
+  white-space: nowrap;
 }
 
 /* Provide additional styling for mobile */
