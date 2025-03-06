@@ -2,9 +2,17 @@
   <div>
     <v-app-bar color="primary" dark app>
       <v-app-bar-nav-icon @click="drawer = !drawer"></v-app-bar-nav-icon>
-      <v-toolbar-title class="cursor-pointer" @click="goToWrite">
-        Templify
-      </v-toolbar-title>
+
+      <div class="logo-container" @click="goToWrite">
+        <img
+          src="@/assets/templify-logo.png"
+          alt="Templify Logo"
+          class="mr-2"
+          height="32"
+        />
+        <v-toolbar-title>Templify</v-toolbar-title>
+      </div>
+
       <v-spacer></v-spacer>
       <v-btn text v-if="!authStore.loggedIn" to="/">Login</v-btn>
       <v-btn text v-else @click="handleLogout">Logout</v-btn>
@@ -81,7 +89,13 @@ export default {
 </script>
 
 <style scoped>
-.cursor-pointer {
+.logo-container {
+  display: flex;
+  align-items: center;
   cursor: pointer;
+}
+
+.logo-container:hover {
+  opacity: 0.9;
 }
 </style>
