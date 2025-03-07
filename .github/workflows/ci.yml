@@ -14,6 +14,9 @@ permissions:
 jobs:
   build_and_dockerize:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: templify
     steps:
       - uses: actions/checkout@v4
         with:
