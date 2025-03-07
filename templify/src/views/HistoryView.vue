@@ -41,6 +41,12 @@
           }}</a>
         </template>
 
+        <template #[`item.articleTitle`]="{ item }">
+          <a @click="viewDetail(item.id)" class="clickable-cell">{{
+            item.articleTitle
+          }}</a>
+        </template>
+
         <template #[`item.content`]="{ item }">
           <a
             @click="viewDetail(item.id)"
@@ -88,6 +94,7 @@ export default {
     const headers = [
       { title: "NO", key: "index", width: "60px", align: "center" },
       { title: "Template", key: "templateName", width: "120px" },
+      { title: "Title", key: "articleTitle", width: "300px" },
       { title: "Content", key: "content" },
       {
         title: "Created At",
@@ -124,6 +131,7 @@ export default {
         id: history.id,
         requestId: history.requestId,
         templateName: history.templateName,
+        articleTitle: history.articleTitle,
         content: history.transformedText,
         originalText: history.originalText,
         createdAt: formatDate(history.createdAt),
