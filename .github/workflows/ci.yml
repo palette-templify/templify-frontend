@@ -65,8 +65,8 @@ jobs:
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile
+          context: templify
+          file: ./templify/Dockerfile
           push: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
