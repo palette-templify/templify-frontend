@@ -2,7 +2,8 @@ name: Templify Vue CI
 
 on:
   push:
-    branches: ["main"]
+    branches: ["feature/AZDmEw2i-frontend-cicd"]
+  workflow_dispatch:
 
 env:
   DOCKER_BUILDKIT: 1
