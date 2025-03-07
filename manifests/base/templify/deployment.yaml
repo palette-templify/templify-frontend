@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: templify-vue-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: templify-vue
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: templify-vue
+    spec:
+      imagePullSecrets:
+        - name: regcred
+      containers:
+      - name: templify-vue-app
+        image: xronace/templify-vue:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsUser: 101
+          runAsGroup: 101
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+        - name: nginx-cache
+          mountPath: /var/cache/nginx
+          readOnly: false
+        - name: nginx-run
+          mountPath: /var/run/nginx
+          readOnly: false
+        resources:
+          requests:
+            cpu: "1"
+            memory: "2Gi"
+          limits:
+            cpu: "1"
+            memory: "2Gi"
+      volumes:
+      - name: nginx-cache
+        emptyDir:
+          medium: Memory
+      - name: nginx-run
+        emptyDir:
+          medium: Memory
