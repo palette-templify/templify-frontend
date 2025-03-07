@@ -1,0 +1,38 @@
+my-vue-app/
+├── node_modules/
+├── public/
+│   ├── index.html
+│   ├── favicon.ico
+│   └── robots.txt
+├── src/
+│   ├── assets/
+│   │   ├── images/
+│   │   └── styles/
+│   ├── components/
+│   │   ├── BaseButton.vue
+│   │   ├── BaseInput.vue
+│   │   └── TheModal.vue
+│   ├── composables/
+│   │   └── useCustomFeature.ts
+│   ├── layouts/
+│   │   └── DefaultLayout.vue
+│   ├── views/
+│   │   ├── Home.vue
+│   │   └── About.vue
+│   ├── router/
+│   │   └── index.ts
+│   ├── store/
+│   │   └── index.ts
+│   ├── plugins/
+│   │   └── axios.ts
+│   ├── services/
+│   │   └── apiService.ts
+│   ├── App.vue
+│   └── main.ts
+├── tests/
+│   ├── unit/
+│   └── e2e/
+├── package.json
+├── tsconfig.json
+├── vue.config.js  // or vue.config.js if using Vue CLI
+└── README.md
