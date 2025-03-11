@@ -50,7 +50,7 @@
             <v-col cols="12" sm="4">
               <div class="text-subtitle-2 text-grey">토큰 수</div>
               <div class="text-body-1 font-weight-medium">
-                {{ historyDetail.tokenCount || 0 }}
+                {{ displayTokenCount(historyDetail.tokenCount) }}
               </div>
             </v-col>
           </v-row>
@@ -75,7 +75,10 @@
           <v-card-title>변환 결과</v-card-title>
         </v-card-item>
         <v-card-text>
-          <div class="text-body-1 transformed-text">
+          <div v-if="isProcessing" class="text-body-1 processing-text">
+            변환중...
+          </div>
+          <div v-else class="text-body-1 transformed-text">
             {{ historyDetail.transformedText }}
           </div>
         </v-card-text>
@@ -108,7 +111,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import apiService from "@/services/apiService";
 
@@ -122,6 +125,19 @@ export default {
     const historyDetail = ref(null);
     const loading = ref(true);
     const error = ref(false);
+
+    // Computed property to check if transformation is still processing
+    const isProcessing = computed(() => {
+      return historyDetail.value && historyDetail.value.tokenCount === -1;
+    });
+
+    // Display token count properly
+    const displayTokenCount = (tokenCount) => {
+      if (tokenCount === -1) {
+        return "계산중...";
+      }
+      return tokenCount || 0;
+    };
 
     // Format date to 'yyyy-mm-dd HH:MM:ss'
     const formatDate = (dateString) => {
@@ -192,6 +208,8 @@ export default {
       historyDetail,
       loading,
       error,
+      isProcessing,
+      displayTokenCount,
       formatDate,
       goBack,
       goToHistoryList,
@@ -210,6 +228,13 @@ export default {
 
 .transformed-text {
   font-weight: 500;
+}
+
+.processing-text {
+  color: #1976d2;
+  font-style: italic;
+  font-weight: 500;
+  font-size: 1.1rem;
 }
 
 .gap-4 {
