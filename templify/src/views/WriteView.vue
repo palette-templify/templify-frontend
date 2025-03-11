@@ -86,14 +86,23 @@
             variant="outlined"
             color="grey-lighten-4"
           >
-            <!-- Loading overlay -->
-            <div v-if="isLoading" class="loading-overlay">
+            <!-- Loading overlay with different statuses - only show when process has started -->
+            <div
+              v-if="transformStatus !== 'idle' && transformStatus !== 'done'"
+              class="loading-overlay"
+            >
               <v-progress-circular
                 indeterminate
                 color="primary"
                 size="64"
               ></v-progress-circular>
-              <div class="mt-4 text-primary">변환 중입니다...</div>
+              <div class="mt-4 text-primary">
+                {{
+                  transformStatus === "waiting"
+                    ? "변환 대기 중입니다..."
+                    : "변환 중입니다..."
+                }}
+              </div>
             </div>
 
             <v-card-text
@@ -116,7 +125,6 @@
             @click="goToHistory"
             min-width="180"
             class="px-6 text-uppercase"
-            :disabled="isLoading"
           >
             Go to History
           </v-btn>
@@ -127,7 +135,7 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
 import apiService from "@/services/apiService";
 
@@ -149,6 +157,11 @@ export default {
 
     // Templates from API
     const templates = ref([]);
+
+    // New polling variables
+    const currentArticleId = ref(null);
+    const pollingInterval = ref(null);
+    const transformStatus = ref("idle"); // 'idle', 'waiting', 'processing', 'done'
 
     // AI Models
     const aiModels = [
@@ -179,12 +192,61 @@ export default {
       }
     };
 
+    // Poll for article transformation status
+    const pollArticleStatus = async () => {
+      if (!currentArticleId.value) return;
+
+      try {
+        const response = await apiService.get(
+          `/api/history/article/${currentArticleId.value}`
+        );
+        const articleData = response.data.data;
+
+        if (!articleData.id) {
+          // Transformation not yet initialized
+          transformStatus.value = "waiting";
+        } else if (articleData.tokenCount === -1) {
+          // Transformation in progress
+          transformStatus.value = "processing";
+        } else {
+          // Transformation complete
+          transformStatus.value = "done";
+          transformedText.value = articleData.transformedText;
+          // Stop polling once complete
+          clearInterval(pollingInterval.value);
+          pollingInterval.value = null;
+          isLoading.value = false;
+        }
+      } catch (error) {
+        console.error("Error polling article status:", error);
+      }
+    };
+
+    // Start polling
+    const startPolling = (articleId) => {
+      currentArticleId.value = articleId;
+      transformStatus.value = "waiting";
+
+      // Clear any existing interval
+      if (pollingInterval.value) {
+        clearInterval(pollingInterval.value);
+      }
+
+      // Start immediately with first check
+      pollArticleStatus();
+
+      // Then set up the interval for every 5 seconds
+      pollingInterval.value = setInterval(pollArticleStatus, 5000);
+    };
+
     // Methods
     const transformText = async () => {
       const isValid = await form.value.validate();
       if (!isValid.valid) return;
 
       isLoading.value = true;
+      transformStatus.value = "waiting";
+      transformedText.value = "";
 
       const payload = {
         // model: selectedModel.value,
@@ -196,10 +258,17 @@ export default {
       try {
         console.log("payload's templateId:", payload.templateId);
         const response = await apiService.post("/api/write/article", payload);
-        transformedText.value = response.data.data.transformedContent;
+
+        // Instead of directly setting transformedText, start polling
+        const articleId = response.data.data.id;
+        if (articleId) {
+          startPolling(articleId);
+        } else {
+          console.error("No article ID returned from API");
+          isLoading.value = false;
+        }
       } catch (error) {
         console.error("Transformation error:", error);
-      } finally {
         isLoading.value = false;
       }
     };
@@ -211,6 +280,14 @@ export default {
     // Fetch templates when component is mounted
     onMounted(() => {
       fetchTemplates();
+    });
+
+    // Clean up interval when component is unmounted
+    onBeforeUnmount(() => {
+      if (pollingInterval.value) {
+        clearInterval(pollingInterval.value);
+        pollingInterval.value = null;
+      }
     });
 
     return {
@@ -227,6 +304,7 @@ export default {
       templates,
       transformText,
       goToHistory,
+      transformStatus,
     };
   },
 };
