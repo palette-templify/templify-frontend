@@ -1,14 +1,30 @@
 <template>
   <v-container fluid class="pa-4">
-    <div class="d-flex align-center mb-4">
+    <div class="d-flex align-center justify-space-between mb-4">
+      <div class="d-flex align-center">
+        <v-btn
+          icon="mdi-arrow-left"
+          variant="text"
+          size="small"
+          class="mr-2"
+          @click="goBack"
+        ></v-btn>
+        <h1 class="text-h4">히스토리 상세</h1>
+      </div>
       <v-btn
-        icon="mdi-arrow-left"
+        icon
+        color="primary"
         variant="text"
-        size="small"
-        class="mr-2"
-        @click="goBack"
-      ></v-btn>
-      <h1 class="text-h4">히스토리 상세</h1>
+        @click="refreshHistoryDetails"
+        :disabled="loading"
+        :loading="loading"
+        size="large"
+      >
+        <v-icon>mdi-refresh</v-icon>
+        <v-tooltip activator="parent" location="bottom">
+          히스토리 상세 정보 새로고침
+        </v-tooltip>
+      </v-btn>
     </div>
 
     <!-- Loading indicator -->
@@ -179,6 +195,10 @@ export default {
       }
     };
 
+    const refreshHistoryDetails = () => {
+      fetchHistoryDetail();
+    };
+
     // Navigation
     const goBack = () => {
       router.back();
@@ -214,6 +234,7 @@ export default {
       goBack,
       goToHistoryList,
       goToWrite,
+      refreshHistoryDetails,
     };
   },
 };

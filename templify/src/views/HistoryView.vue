@@ -1,6 +1,24 @@
 <template>
   <v-container fluid class="pa-4">
-    <h1 class="text-h4 mb-4">변환 히스토리</h1>
+    <!-- Header with Refresh Button -->
+    <div class="d-flex justify-space-between align-center mb-4">
+      <h1 class="text-h4">변환 히스토리</h1>
+      <v-btn
+        icon
+        color="primary"
+        variant="text"
+        @click="refreshHistories"
+        :disabled="loading"
+        :loading="loading"
+        size="large"
+        class="ml-2"
+      >
+        <v-icon>mdi-refresh</v-icon>
+        <v-tooltip activator="parent" location="bottom">
+          히스토리 목록 새로고침
+        </v-tooltip>
+      </v-btn>
+    </div>
 
     <!-- Loading indicator -->
     <div v-if="loading" class="d-flex justify-center align-center my-6">
@@ -164,6 +182,11 @@ export default {
       }
     };
 
+    // Refresh histories
+    const refreshHistories = () => {
+      fetchHistories();
+    };
+
     // Navigation
     const goToWrite = () => {
       router.push("/write");
@@ -187,6 +210,7 @@ export default {
       error,
       goToWrite,
       viewDetail,
+      refreshHistories,
     };
   },
 };

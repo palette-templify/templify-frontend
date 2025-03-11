@@ -58,18 +58,28 @@
             :disabled="isLoading"
           ></v-textarea>
 
-          <!-- Transform button with centered alignment -->
-          <div class="d-flex justify-center mb-2">
+          <!-- Transform and Write New buttons with centered alignment -->
+          <div class="d-flex justify-center gap-4 mb-2">
             <v-btn
               color="primary"
               size="large"
               @click="transformText"
               :loading="isLoading"
               :disabled="!valid || isLoading"
-              min-width="180"
-              class="px-6 text-uppercase"
+              min-width="140"
+              class="px-4 text-uppercase"
             >
               {{ isLoading ? "Transforming..." : "Transform" }}
+            </v-btn>
+            <v-btn
+              color="secondary"
+              variant="outlined"
+              size="large"
+              @click="handleResetForm"
+              min-width="140"
+              class="px-4 text-uppercase"
+            >
+              Write New
             </v-btn>
           </div>
         </v-form>
@@ -273,6 +283,36 @@ export default {
       }
     };
 
+    // Reset the form to start over with a new article
+    const handleResetForm = () => {
+      // Reset form inputs
+      selectedModel.value = "";
+      selectedTemplateId.value = "";
+      subject.value = "";
+      originalText.value = "";
+      transformedText.value = "";
+
+      // Reset status
+      transformStatus.value = "idle";
+
+      // Stop polling if in progress
+      if (pollingInterval.value) {
+        clearInterval(pollingInterval.value);
+        pollingInterval.value = null;
+      }
+
+      // Reset article ID
+      currentArticleId.value = null;
+
+      // Reset loading state
+      isLoading.value = false;
+
+      // Reset form validation
+      if (form.value) {
+        form.value.reset();
+      }
+    };
+
     const goToHistory = () => {
       router.push("/history");
     };
@@ -303,6 +343,7 @@ export default {
       aiModels,
       templates,
       transformText,
+      handleResetForm,
       goToHistory,
       transformStatus,
     };
@@ -384,5 +425,9 @@ export default {
   justify-content: center;
   align-items: center;
   z-index: 10;
+}
+
+.gap-4 {
+  gap: 1rem;
 }
 </style>
