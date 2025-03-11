@@ -52,7 +52,10 @@
             @click="viewDetail(item.id)"
             class="clickable-cell text-truncate d-block"
           >
-            {{ item.content }}
+            <span v-if="item.isProcessing" class="processing-text"
+              >변환중...</span
+            >
+            <span v-else>{{ item.content }}</span>
           </a>
         </template>
 
@@ -136,6 +139,7 @@ export default {
         originalText: history.originalText,
         createdAt: formatDate(history.createdAt),
         createdDate: new Date(history.createdAt), // Hidden field for sorting
+        isProcessing: history.tokenCount === -1, // Flag to indicate if the item is still being processed
       }));
     });
 
@@ -217,6 +221,12 @@ export default {
 
 .nowrap {
   white-space: nowrap;
+}
+
+.processing-text {
+  color: #1976d2;
+  font-style: italic;
+  font-weight: 500;
 }
 
 /* Provide additional styling for mobile */
