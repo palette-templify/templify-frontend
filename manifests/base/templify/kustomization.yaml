@@ -6,5 +6,5 @@ resources:
   - ingress.yaml
 images:
 - name: xronace/templify-vue
-  newTag: 1.2.0
+  newTag: 1.2.0.1
 namespace: templify
